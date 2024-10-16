@@ -3,7 +3,6 @@
 This module was made to configure our srx firewall server. It doesnt contains all possible configuration and it can be improve. We tried to make shortcuts to make it simplier to use and to read.
 we will configure the following:
 
-
 ## System
 
     terraform import junos_system.system random
@@ -14,7 +13,6 @@ we will configure the following:
 
 To add new system values
 
-
 ### snmp.tf
 
     terraform import junos_snmp.snmp random
@@ -23,14 +21,14 @@ To add new system values
 To add new snmp
 
     snmp = {
-      contact = "noc@axione.fr"
+      contact = "noc@exemple.fr"
       location = "OVH - roubaix, France"
       health_monitor = [{
         falling_threshold = 22
         interval = 45
       }]
     }
-  
+
     snmp_community = {
       cpdea = {
         authorization_read_only = true
@@ -43,7 +41,6 @@ To add new snmp
       }
     }
 
-
 ## Security zones
 
 security zones must exist before creating interfaces
@@ -52,7 +49,6 @@ In case the firewall isnt empty we can import the existing configuration like th
 
     terraform import module.xxxxxxx.junos_security_zone.this[\"ZONENAME\"] ZONENAME
     terraform import junos_security_zone.common_staging common-staging
-
 
 to add new zone use the variable security_zones
 
@@ -67,8 +63,6 @@ to add new zone use the variable security_zones
       secure-staging = {}
     }
 
-
-
 ## interfaces
 
 We consider physical and logical interfaces
@@ -80,22 +74,21 @@ To import existing config:
 
 To add interfaces we do:
 
-  interfaces_logical = {
-    "ge-0/0/0.1907" = {
-      routing_instance          = "PFSv2"
-      security_zone             = "interco_pfs"
-      security_inbound_services = ["ping"]
-      cidr_ip = ["10.1.254.105/31"]
-      }
-    "ge-0/0/1.2021" = {
-      routing_instance          = "PFSv2"
-      security_zone             = "common-staging"
-      security_inbound_services = ["ping"]
-      cidr_ip = ["10.4.5.1/24"]
-    }
-  }
+interfaces_logical = {
+"ge-0/0/0.1907" = {
+routing_instance = "PFSv2"
+security_zone = "interco_pfs"
+security_inbound_services = ["ping"]
+cidr_ip = ["10.1.254.105/31"]
+}
+"ge-0/0/1.2021" = {
+routing_instance = "PFSv2"
+security_zone = "common-staging"
+security_inbound_services = ["ping"]
+cidr_ip = ["10.4.5.1/24"]
+}
+}
 
-  
 ## policy-statements
 
     terraform import junos_policyoptions_policy_statement.export-907 export-907
@@ -113,12 +106,11 @@ To add new policy statements:
       }
     }
 
-
 ## routing instance
 
-  terraform import junos_routing_instance.PFSv2 PFSv2
-  terraform import junos_bgp_group.PFSv2 VPRN907_-_PFSv2
-  terraform import junos_bgp_neighbor.PFSv2 10.1.254.104_-_PFSv2_-_VPRN907
+terraform import junos*routing_instance.PFSv2 PFSv2
+terraform import junos_bgp_group.PFSv2 VPRN907*-_PFSv2
+terraform import junos_bgp_neighbor.PFSv2 10.1.254.104_-_PFSv2_-\_VPRN907
 
 To add new routing instances:
 
@@ -128,7 +120,7 @@ To add new routing instances:
         as = "65059"
       }
     }
-  
+
     bgp_group = {
       VPRN907 = {
         routing_instance = "PFSv2"
@@ -138,7 +130,7 @@ To add new routing instances:
         export = ["export-907"]
       }
     }
- 
+
     bgp_neighbor = {
       PFSv2 = {
         group = "VPRN907"
@@ -146,10 +138,9 @@ To add new routing instances:
       }
     }
 
-
 ## Add new vlan
 
-Exemple: roubaix	pcc-92-222-223-4_datacenter1710	staging	2	common	2021	common-staging	10.4.5.0/24		fwv-rbx59-08.infra	PFSv2
+Exemple: roubaix pcc-92-222-223-4_datacenter1710 staging 2 common 2021 common-staging 10.4.5.0/24 fwv-rbx59-08.infra PFSv2
 
 1/ ensure subnet routes exist in policy options
 
@@ -170,7 +161,7 @@ Exemple: roubaix	pcc-92-222-223-4_datacenter1710	staging	2	common	2021	common-st
 
     resource "junos_interface_logical" "common_staging" {
       depends_on = [junos_security_zone.common_staging]
-    
+
       name                      = "ge-0/0/1.2021"
       description               = "common-staging"
       vlan_id                   = "2021"
